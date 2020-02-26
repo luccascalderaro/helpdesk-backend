@@ -1,20 +1,17 @@
 package com.luccascalderaro.helpdesk.api.service;
 
-import org.springframework.data.domain.Page;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.luccascalderaro.helpdesk.api.entity.User;
+import com.luccascalderaro.helpdesk.api.security.UserSS;
 
-public interface UserService {
-	
-	User findByEmail(String email);
-	
-	User createOrUpdate(User user);
-	
-	User findById(String id);
-	
-	void delete(String id);
-	
-	Page<User> findAll(int page, int count);
-	
+public class UserService {
 
+	public static UserSS authenticated() {
+		// Retorna o usuario logado no sistema
+		try {
+			return (UserSS) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		} catch (Exception e) {
+			return null;
+		}
+	}
 }

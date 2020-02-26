@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 import com.luccascalderaro.helpdesk.api.entity.User;
 import com.luccascalderaro.helpdesk.api.exception.ObjectNotFoundException;
 import com.luccascalderaro.helpdesk.api.repository.UserRepository;
-import com.luccascalderaro.helpdesk.api.service.UserService;
+import com.luccascalderaro.helpdesk.api.service.UserServiceInterface;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserServiceInterface {
 	
 	@Autowired
 	private UserRepository userRepository;

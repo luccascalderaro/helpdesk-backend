@@ -11,17 +11,16 @@ import com.luccascalderaro.helpdesk.api.entity.Ticket;
 @Repository
 public interface TicketRepository extends MongoRepository<Ticket, String> {
 
-	Page<Ticket> findByUserIdOrderByDateDesc(Pageable pages, String userId);
-
+Page<Ticket> findByUserIdOrderByDateDesc(Pageable pages,String userId);
+	
 	Page<Ticket> findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingOrderByDateDesc(
-			String title, String status, String priority, Pageable pages);
-
+			String title,String status,String priority,Pageable pages);
+	
 	Page<Ticket> findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingAndUserIdOrderByDateDesc(
-			String title, String status, String priority, String userId, Pageable pages);
-
-	Page<Ticket> findByNumber(Integer number, Pageable pages);
-
+			String title,String status,String priority,String userId,Pageable pages);
+	
+	Page<Ticket> findByNumber(Integer number,Pageable pages);
+	
 	Page<Ticket> findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingAndAssignedUserIdOrderByDateDesc(
-			String title, String status, String priority, String assignedUserId, Pageable pages);
-
+			String title,String status,String priority,String assignedUserId,Pageable pages);
 }

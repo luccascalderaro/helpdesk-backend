@@ -13,7 +13,7 @@ import com.luccascalderaro.helpdesk.api.enums.ProfileEnum;
 public class UserSS implements UserDetails{
 	private static final long serialVersionUID = 1L;
 	
-	private Integer id;
+	private String id;
 	private String email;
 	private String senha;
 	private Collection<? extends GrantedAuthority> authorities;
@@ -24,7 +24,7 @@ public class UserSS implements UserDetails{
 	}
 	
 	
-	public UserSS(Integer id, String email, String senha, Set<ProfileEnum> profile) {
+	public UserSS(String id, String email, String senha, Set<ProfileEnum> profile) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -32,7 +32,7 @@ public class UserSS implements UserDetails{
 		this.authorities = profile.stream().map(x -> new SimpleGrantedAuthority(x.name())).collect(Collectors.toList());
 	}
 
-	public Integer getId() {
+	public String getId() {
 		return id;
 	}
 

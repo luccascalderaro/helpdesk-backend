@@ -1,5 +1,7 @@
 package com.luccascalderaro.helpdesk.api.entity;
 
+import java.util.Set;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -25,7 +27,20 @@ public class User {
 	@Size(min = 6,message = "A senha deve ter no minimo 6 digitos")
 	private String password;
 	
-	private ProfileEnum profile;
+	private Set<ProfileEnum> profile;
+	
+	
+	public User () {
+		
+	}
+
+	public User(String id, @NotBlank(message = "Email requerido") @Email(message = "Email invalido") String email,
+			@NotBlank(message = "Digite uma senha") @Size(min = 6, message = "A senha deve ter no minimo 6 digitos") String password) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.password = password;
+	}
 
 	public String getId() {
 		return id;
@@ -51,13 +66,18 @@ public class User {
 		this.password = password;
 	}
 
-	public ProfileEnum getProfile() {
+
+	public Set<ProfileEnum> getProfile() {
 		return profile;
 	}
 
-	public void setProfile(ProfileEnum profile) {
+
+
+	public void setProfile(Set<ProfileEnum> profile) {
 		this.profile = profile;
 	}
+
+	
 	
 	
 	
