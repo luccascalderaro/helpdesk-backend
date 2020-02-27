@@ -13,6 +13,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,13 +72,39 @@ public class UserResource {
 		}
 	}
 	
-	@GetMapping()
-	public ResponseEntity<Page<User>> findAll() {
-		
-		Page<User> list = userService.findAll(1, 2);
-		
-		return ResponseEntity.ok().body(list);
-		
+	@PutMapping
+	@PreAuthorize("hasAnyRole('ADMIN')")
+	public ResponseEntity<Response<User>> update(HttpServletRequest request, @RequestBody User user, BindingResult result){
+		 Response<User> response = new Response<User>();
+		 
+		 try {
+			 validateUpdateUser(user, result);
+			 if(result.hasErrors()) {
+				 result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
+				 return ResponseEntity.badRequest().body(response);
+			 }
+			 user.setPassword(pe.encode(user.getPassword()));
+			 User userPersisted = (User) userService.createOrUpdate(user);
+			 response.setData(userPersisted);
+		 }
+		 
+		 catch(Exception e) {
+			 response.getErrors().add(e.getMessage());
+			 return ResponseEntity.badRequest().body(response);
+		 }
+		 
+		 return ResponseEntity.ok(response);
 	}
+	
+	private void validateUpdateUser(User user, BindingResult result) {
+		if(user.getId() == null) {
+			result.addError(new ObjectError("User", "Id nao preenchido"));
+		}
+		
+		if(user.getEmail()==null) {
+			result.addError(new ObjectError("User", "Email nao informado"));
+		}
+	}
+	
 
 }
