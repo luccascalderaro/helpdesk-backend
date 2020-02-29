@@ -137,7 +137,7 @@ public class UserResource {
 			
 	}
 	
-	@GetMapping(value = "{page}/{count}")
+	@GetMapping(value = "/{page}/{count}")
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	public ResponseEntity<Response<Page<User>>> finAll(@PathVariable int page, @PathVariable int count){
 		Response<Page<User>> response = new Response<Page<User>>();
