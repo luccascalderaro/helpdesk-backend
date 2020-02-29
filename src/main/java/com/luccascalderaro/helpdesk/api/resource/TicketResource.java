@@ -9,6 +9,7 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.luccascalderaro.helpdesk.api.entity.ChangeStatus;
 import com.luccascalderaro.helpdesk.api.entity.Ticket;
 import com.luccascalderaro.helpdesk.api.entity.User;
+import com.luccascalderaro.helpdesk.api.enums.ProfileEnum;
 import com.luccascalderaro.helpdesk.api.enums.StatusEnum;
 import com.luccascalderaro.helpdesk.api.response.Response;
 import com.luccascalderaro.helpdesk.api.security.UserSS;
@@ -179,5 +181,25 @@ public class TicketResource {
 		ticketService.delete(id);
 		return ResponseEntity.ok(new Response<String>());
 	}
+	
+	
+	@GetMapping(value = "/{page}/{count}")
+	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
+	public ResponseEntity <Response<Page<Ticket>>> findAll(HttpServletRequest request ,@PathVariable("page") int page, @PathVariable("count") int count ) {
+		Response<Page<Ticket>> response = new Response<Page<Ticket>>();
+		Page<Ticket>  tickets = null;
+		User userRequest = userFromRequest(request);
+		
+		
+		if(userRequest.getProfile().contains(ProfileEnum.ROLE_TECHNICIAN)) {
+			tickets = ticketService.listTicket(page, count);
+		}	else if(userRequest.getProfile().contains(ProfileEnum.ROLE_CUSTOMER)) {
+			tickets = ticketService.findByCurrentUser(page, count, userRequest.getId());
+		}
+		
+		response.setData(tickets);
+		return ResponseEntity.ok(response);
+	}
+	
 
 }
