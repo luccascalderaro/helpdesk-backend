@@ -148,42 +148,55 @@ public class TicketResource {
 	}
 	
 
-	private void validateUpdateTicket(Ticket ticket, BindingResult result) {
-		if (ticket.getId() == null) {
-			result.addError(new ObjectError("Ticket", "Id não informado"));
-			return;
-		}
+//	private void validateUpdateTicket(Ticket ticket, BindingResult result) {
+//		if (ticket.getId() == null) {
+//			result.addError(new ObjectError("Ticket", "Id não informado"));
+//			return;
+//		}
+//
+//		if (ticket.getTitle() == null) {
+//			result.addError(new ObjectError("Ticket", "Titulo não informado"));
+//			return;
+//		}
+//
+//	}
 
-		if (ticket.getTitle() == null) {
-			result.addError(new ObjectError("Ticket", "Titulo não informado"));
-			return;
-		}
-
-	}
-
+//	@GetMapping(value = "/{id}")
+//	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
+//	public ResponseEntity<Response<Ticket>> findById(@PathVariable("id") String id) {
+//		Response<Ticket> response = new Response<Ticket>();
+//		Ticket ticket = ticketService.findById(id);
+//		if (ticket == null) {
+//			response.getErrors().add("Registro não encontrado pelo id: " + id);
+//			return ResponseEntity.badRequest().body(response);
+//		}
+//
+//		List<ChangeStatus> changes = new ArrayList<ChangeStatus>();
+//		Iterable<ChangeStatus> changesCurrent = ticketService.listChangeStatus(ticket.getId());
+//		for (Iterator<ChangeStatus> iterator = changesCurrent.iterator(); iterator.hasNext();) {
+//			ChangeStatus changeStatus = (ChangeStatus) iterator.next();
+//			changeStatus.setTicket(null);
+//			changes.add(changeStatus);
+//
+//		}
+//		ticket.setChanges(changes);
+//		response.setData(ticket);
+//		return ResponseEntity.ok(response);
+//
+//	}
+	
+	
 	@GetMapping(value = "/{id}")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
-	public ResponseEntity<Response<Ticket>> findById(@PathVariable("id") String id) {
-		Response<Ticket> response = new Response<Ticket>();
+	public ResponseEntity<Ticket> findById(@PathVariable("id") String id) {
+		
 		Ticket ticket = ticketService.findById(id);
-		if (ticket == null) {
-			response.getErrors().add("Registro não encontrado pelo id: " + id);
-			return ResponseEntity.badRequest().body(response);
-		}
-
-		List<ChangeStatus> changes = new ArrayList<ChangeStatus>();
-		Iterable<ChangeStatus> changesCurrent = ticketService.listChangeStatus(ticket.getId());
-		for (Iterator<ChangeStatus> iterator = changesCurrent.iterator(); iterator.hasNext();) {
-			ChangeStatus changeStatus = (ChangeStatus) iterator.next();
-			changeStatus.setTicket(null);
-			changes.add(changeStatus);
-
-		}
-		ticket.setChanges(changes);
-		response.setData(ticket);
-		return ResponseEntity.ok(response);
-
+		
+		return ResponseEntity.ok().body(ticket);		
 	}
+	
+	
+	
 
 	@DeleteMapping(value = "/{id}")
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
