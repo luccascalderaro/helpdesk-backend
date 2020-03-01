@@ -1,5 +1,6 @@
 package com.luccascalderaro.helpdesk.api.resource;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.luccascalderaro.helpdesk.api.dto.Summary;
 import com.luccascalderaro.helpdesk.api.entity.ChangeStatus;
@@ -35,6 +37,7 @@ import com.luccascalderaro.helpdesk.api.security.UserSS;
 import com.luccascalderaro.helpdesk.api.service.TicketService;
 import com.luccascalderaro.helpdesk.api.service.UserService;
 import com.luccascalderaro.helpdesk.api.service.UserServiceInterface;
+import com.luccascalderaro.helpdesk.api.service.impl.TicketServiceImpl;
 
 @RestController
 @RequestMapping("/api/ticket")
@@ -42,95 +45,108 @@ import com.luccascalderaro.helpdesk.api.service.UserServiceInterface;
 public class TicketResource {
 
 	@Autowired
-	private TicketService ticketService;
+	private TicketServiceImpl ticketService;
 
 	@Autowired
 	protected UserService userLogado;
 
-	@Autowired
-	private UserServiceInterface userService;
-
+//	@PostMapping()
+//	@PreAuthorize("hasAnyRole('CUSTOMER')")
+//	public ResponseEntity<Response<Ticket>> createOrUpdate(HttpServletRequest request, @RequestBody Ticket ticket,
+//			BindingResult result) {
+//		Response<Ticket> response = new Response<Ticket>();
+//
+//		try {
+//
+//			validateCreateTicket(ticket, result);
+//			if (result.hasErrors()) {
+//				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
+//				return ResponseEntity.badRequest().body(response);
+//			}
+//
+//			ticket.setStatus(StatusEnum.getStatus("New"));
+//			ticket.setUser(userFromRequest(request));
+//			ticket.setDate(new Date());
+//			ticket.setNumber(generateNumber());
+//			Ticket ticketPersisted = (Ticket) ticketService.createOrUpdate(ticket);
+//			response.setData(ticketPersisted);
+//
+//		} catch (Exception e) {
+//			response.getErrors().add(e.getMessage());
+//			return ResponseEntity.badRequest().body(response);
+//
+//		}
+//		return ResponseEntity.ok(response);
+//	}
+	
 	@PostMapping()
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
-	public ResponseEntity<Response<Ticket>> createOrUpdate(HttpServletRequest request, @RequestBody Ticket ticket,
-			BindingResult result) {
-		Response<Ticket> response = new Response<Ticket>();
-
-		try {
-
-			validateCreateTicket(ticket, result);
-			if (result.hasErrors()) {
-				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
-				return ResponseEntity.badRequest().body(response);
-			}
-
-			ticket.setStatus(StatusEnum.getStatus("New"));
-			ticket.setUser(userFromRequest(request));
-			ticket.setDate(new Date());
-			ticket.setNumber(generateNumber());
-			Ticket ticketPersisted = (Ticket) ticketService.createOrUpdate(ticket);
-			response.setData(ticketPersisted);
-
-		} catch (Exception e) {
-			response.getErrors().add(e.getMessage());
-			return ResponseEntity.badRequest().body(response);
-
-		}
-		return ResponseEntity.ok(response);
+	public ResponseEntity<Ticket> insert(HttpServletRequest request, @RequestBody Ticket ticket, BindingResult result) {
+		
+		ticket.setId(null);
+		ticketService.insert(ticket);
+		
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(ticket.getId()).toUri();
+		
+		return ResponseEntity.created(uri).build();
 	}
+	
+	
 
-	private void validateCreateTicket(Ticket ticket, BindingResult result) {
+//	private void validateCreateTicket(Ticket ticket, BindingResult result) {
+//
+//		if (ticket.getTitle() == null) {
+//			result.addError(new ObjectError("Ticket", "Titulo não informado"));
+//			return;
+//		}
+//
+//	}
 
-		if (ticket.getTitle() == null) {
-			result.addError(new ObjectError("Ticket", "Titulo não informado"));
-			return;
-		}
 
-	}
 
-	public User userFromRequest(HttpServletRequest request) {
+	
 
-		UserSS uss = UserService.authenticated();
-
-		return userService.findById(uss.getId());
-
-	}
-
-	private Integer generateNumber() {
-		Random random = new Random();
-		return random.nextInt(9999);
-	}
-
+//	@PutMapping()
+//	@PreAuthorize("hasAnyRole('CUSTOMER')")
+//	public ResponseEntity<Response<Ticket>> update(HttpServletRequest request, @RequestBody Ticket ticket,
+//			BindingResult result) {
+//		Response<Ticket> response = new Response<Ticket>();
+//
+//		try {
+//			validateUpdateTicket(ticket, result);
+//			if (result.hasErrors()) {
+//				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
+//				return ResponseEntity.badRequest().body(response);
+//			}
+//
+//			Ticket ticketCurrent = ticketService.findById(ticket.getId());
+//			ticket.setStatus(ticketCurrent.getStatus());
+//			ticket.setUser(ticketCurrent.getUser());
+//			ticket.setDate(ticketCurrent.getDate());
+//			ticket.setNumber(ticketCurrent.getNumber());
+//			if (ticketCurrent.getAssignedUser() != null) {
+//				ticket.setAssignedUser(ticketCurrent.getAssignedUser());
+//			}
+//			Ticket ticketPersisted = (Ticket) ticketService.createOrUpdate(ticket);
+//			response.setData(ticketPersisted);
+//		} catch (Exception e) {
+//			response.getErrors().add(e.getMessage());
+//			return ResponseEntity.badRequest().body(response);
+//
+//		}
+//		return ResponseEntity.ok(response);
+//	}
+	
 	@PutMapping()
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
-	public ResponseEntity<Response<Ticket>> update(HttpServletRequest request, @RequestBody Ticket ticket,
+	public ResponseEntity<Ticket> update(HttpServletRequest request, @RequestBody Ticket ticket,
 			BindingResult result) {
-		Response<Ticket> response = new Response<Ticket>();
-
-		try {
-			validateUpdateTicket(ticket, result);
-			if (result.hasErrors()) {
-				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
-				return ResponseEntity.badRequest().body(response);
-			}
-
-			Ticket ticketCurrent = ticketService.findById(ticket.getId());
-			ticket.setStatus(ticketCurrent.getStatus());
-			ticket.setUser(ticketCurrent.getUser());
-			ticket.setDate(ticketCurrent.getDate());
-			ticket.setNumber(ticketCurrent.getNumber());
-			if (ticketCurrent.getAssignedUser() != null) {
-				ticket.setAssignedUser(ticketCurrent.getAssignedUser());
-			}
-			Ticket ticketPersisted = (Ticket) ticketService.createOrUpdate(ticket);
-			response.setData(ticketPersisted);
-		} catch (Exception e) {
-			response.getErrors().add(e.getMessage());
-			return ResponseEntity.badRequest().body(response);
-
-		}
-		return ResponseEntity.ok(response);
+		
+		ticketService.update(ticket);
+		
+		return ResponseEntity.noContent().build();
 	}
+	
 
 	private void validateUpdateTicket(Ticket ticket, BindingResult result) {
 		if (ticket.getId() == null) {
@@ -189,7 +205,7 @@ public class TicketResource {
 			@PathVariable("count") int count) {
 		Response<Page<Ticket>> response = new Response<Page<Ticket>>();
 		Page<Ticket> tickets = null;
-		User userRequest = userFromRequest(request);
+		User userRequest = ticketService.userFromRequest(request);
 
 		if (userRequest.getProfile().contains(ProfileEnum.ROLE_TECHNICIAN)) {
 			tickets = ticketService.listTicket(page, count);
@@ -223,7 +239,7 @@ public class TicketResource {
 		if (number > 0) {
 			tickets = ticketService.findByNumber(page, count, number);
 		} else {
-			User userRequest = userFromRequest(request);
+			User userRequest = ticketService.userFromRequest(request);
 			if (userRequest.getProfile().contains(ProfileEnum.ROLE_TECHNICIAN)) {
 				if (assigned) {
 					tickets = ticketService.findByParameterAndAssignedUser(page, count, title, status, priority,
@@ -240,41 +256,41 @@ public class TicketResource {
 		return ResponseEntity.ok(response);
 	}
 
-	@PutMapping(value = "/{id}/{status}")
-	@PreAuthorize("hasAnyRole('CUSTOMER','TECHNICIAN')")
-	public ResponseEntity<Response<Ticket>> changeStatus(
-													@PathVariable("id") String id, 
-													@PathVariable("status") String status, 
-													HttpServletRequest request,  
-													@RequestBody Ticket ticket,
-													BindingResult result) {
-		
-		Response<Ticket> response = new Response<Ticket>();
-		try {
-			validateChangeStatus(id, status, result);
-			if (result.hasErrors()) {
-				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
-				return ResponseEntity.badRequest().body(response);
-			}
-			Ticket ticketCurrent = ticketService.findById(id);
-			ticketCurrent.setStatus(StatusEnum.getStatus(status));
-			if(status.equals("Assigned")) {
-				ticketCurrent.setAssignedUser(userFromRequest(request));
-			}
-			Ticket ticketPersisted = (Ticket) ticketService.createOrUpdate(ticketCurrent);
-			ChangeStatus changeStatus = new ChangeStatus();
-			changeStatus.setUserChange(userFromRequest(request));
-			changeStatus.setDateChangeStatus(new Date());
-			changeStatus.setStatus(StatusEnum.getStatus(status));
-			changeStatus.setTicket(ticketPersisted);
-			ticketService.createChangeStatus(changeStatus);
-			response.setData(ticketPersisted);
-		} catch (Exception e) {
-			response.getErrors().add(e.getMessage());
-			return ResponseEntity.badRequest().body(response);
-		}
-		return ResponseEntity.ok(response);
-	}
+//	@PutMapping(value = "/{id}/{status}")
+//	@PreAuthorize("hasAnyRole('CUSTOMER','TECHNICIAN')")
+//	public ResponseEntity<Response<Ticket>> changeStatus(
+//													@PathVariable("id") String id, 
+//													@PathVariable("status") String status, 
+//													HttpServletRequest request,  
+//													@RequestBody Ticket ticket,
+//													BindingResult result) {
+//		
+//		Response<Ticket> response = new Response<Ticket>();
+//		try {
+//			validateChangeStatus(id, status, result);
+//			if (result.hasErrors()) {
+//				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
+//				return ResponseEntity.badRequest().body(response);
+//			}
+//			Ticket ticketCurrent = ticketService.findById(id);
+//			ticketCurrent.setStatus(StatusEnum.getStatus(status));
+//			if(status.equals("Assigned")) {
+//				ticketCurrent.setAssignedUser(userFromRequest(request));
+//			}
+//			Ticket ticketPersisted = (Ticket) ticketService.createOrUpdate(ticketCurrent);
+//			ChangeStatus changeStatus = new ChangeStatus();
+//			changeStatus.setUserChange(userFromRequest(request));
+//			changeStatus.setDateChangeStatus(new Date());
+//			changeStatus.setStatus(StatusEnum.getStatus(status));
+//			changeStatus.setTicket(ticketPersisted);
+//			ticketService.createChangeStatus(changeStatus);
+//			response.setData(ticketPersisted);
+//		} catch (Exception e) {
+//			response.getErrors().add(e.getMessage());
+//			return ResponseEntity.badRequest().body(response);
+//		}
+//		return ResponseEntity.ok(response);
+//	}
 	
 	private void validateChangeStatus(String id,String status, BindingResult result) {
 		if (id == null || id.equals("")) {

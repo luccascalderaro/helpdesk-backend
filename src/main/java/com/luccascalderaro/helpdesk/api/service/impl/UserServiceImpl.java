@@ -15,7 +15,6 @@ import com.luccascalderaro.helpdesk.api.exception.DataIntegrityException;
 import com.luccascalderaro.helpdesk.api.exception.ObjectNotFoundException;
 import com.luccascalderaro.helpdesk.api.repository.UserRepository;
 import com.luccascalderaro.helpdesk.api.service.UserServiceInterface;
-import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
 
 @Service

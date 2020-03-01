@@ -9,7 +9,7 @@ import com.luccascalderaro.helpdesk.api.entity.Ticket;
 @Component
 public interface TicketService {
 	
-	Ticket createOrUpdate(Ticket ticket);
+	Ticket insert(Ticket ticket);
 	
 	Ticket findById(String id);
 	
