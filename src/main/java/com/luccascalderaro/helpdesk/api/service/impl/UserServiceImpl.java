@@ -3,6 +3,7 @@ package com.luccascalderaro.helpdesk.api.service.impl;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.luccascalderaro.helpdesk.api.entity.User;
+import com.luccascalderaro.helpdesk.api.exception.DataIntegrityException;
 import com.luccascalderaro.helpdesk.api.exception.ObjectNotFoundException;
 import com.luccascalderaro.helpdesk.api.repository.UserRepository;
 import com.luccascalderaro.helpdesk.api.service.UserServiceInterface;
@@ -79,7 +81,12 @@ public class UserServiceImpl implements UserServiceInterface {
 	@Override
 	public void delete(String id) {
 		
+		try {
 		this.userRepository.deleteById(id);
+		}
+		catch(DataIntegrityViolationException e) {
+			throw new DataIntegrityException("Não foi possivel deletar o Usuario");
+		}
 		
 	}
 
