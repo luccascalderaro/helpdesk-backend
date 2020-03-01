@@ -50,35 +50,6 @@ public class TicketResource {
 	@Autowired
 	protected UserService userLogado;
 
-//	@PostMapping()
-//	@PreAuthorize("hasAnyRole('CUSTOMER')")
-//	public ResponseEntity<Response<Ticket>> createOrUpdate(HttpServletRequest request, @RequestBody Ticket ticket,
-//			BindingResult result) {
-//		Response<Ticket> response = new Response<Ticket>();
-//
-//		try {
-//
-//			validateCreateTicket(ticket, result);
-//			if (result.hasErrors()) {
-//				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
-//				return ResponseEntity.badRequest().body(response);
-//			}
-//
-//			ticket.setStatus(StatusEnum.getStatus("New"));
-//			ticket.setUser(userFromRequest(request));
-//			ticket.setDate(new Date());
-//			ticket.setNumber(generateNumber());
-//			Ticket ticketPersisted = (Ticket) ticketService.createOrUpdate(ticket);
-//			response.setData(ticketPersisted);
-//
-//		} catch (Exception e) {
-//			response.getErrors().add(e.getMessage());
-//			return ResponseEntity.badRequest().body(response);
-//
-//		}
-//		return ResponseEntity.ok(response);
-//	}
-	
 	@PostMapping()
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
 	public ResponseEntity<Ticket> insert(HttpServletRequest request, @RequestBody Ticket ticket, BindingResult result) {
@@ -91,52 +62,6 @@ public class TicketResource {
 		return ResponseEntity.created(uri).build();
 	}
 	
-	
-
-//	private void validateCreateTicket(Ticket ticket, BindingResult result) {
-//
-//		if (ticket.getTitle() == null) {
-//			result.addError(new ObjectError("Ticket", "Titulo não informado"));
-//			return;
-//		}
-//
-//	}
-
-
-
-	
-
-//	@PutMapping()
-//	@PreAuthorize("hasAnyRole('CUSTOMER')")
-//	public ResponseEntity<Response<Ticket>> update(HttpServletRequest request, @RequestBody Ticket ticket,
-//			BindingResult result) {
-//		Response<Ticket> response = new Response<Ticket>();
-//
-//		try {
-//			validateUpdateTicket(ticket, result);
-//			if (result.hasErrors()) {
-//				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
-//				return ResponseEntity.badRequest().body(response);
-//			}
-//
-//			Ticket ticketCurrent = ticketService.findById(ticket.getId());
-//			ticket.setStatus(ticketCurrent.getStatus());
-//			ticket.setUser(ticketCurrent.getUser());
-//			ticket.setDate(ticketCurrent.getDate());
-//			ticket.setNumber(ticketCurrent.getNumber());
-//			if (ticketCurrent.getAssignedUser() != null) {
-//				ticket.setAssignedUser(ticketCurrent.getAssignedUser());
-//			}
-//			Ticket ticketPersisted = (Ticket) ticketService.createOrUpdate(ticket);
-//			response.setData(ticketPersisted);
-//		} catch (Exception e) {
-//			response.getErrors().add(e.getMessage());
-//			return ResponseEntity.badRequest().body(response);
-//
-//		}
-//		return ResponseEntity.ok(response);
-//	}
-	
 	@PutMapping()
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
 	public ResponseEntity<Ticket> update(HttpServletRequest request, @RequestBody Ticket ticket,
@@ -147,44 +72,6 @@ public class TicketResource {
 		return ResponseEntity.noContent().build();
 	}
 	
-
-//	private void validateUpdateTicket(Ticket ticket, BindingResult result) {
-//		if (ticket.getId() == null) {
-//			result.addError(new ObjectError("Ticket", "Id não informado"));
-//			return;
-//		}
-//
-//		if (ticket.getTitle() == null) {
-//			result.addError(new ObjectError("Ticket", "Titulo não informado"));
-//			return;
-//		}
-//
-//	}
-
-//	@GetMapping(value = "/{id}")
-//	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
-//	public ResponseEntity<Response<Ticket>> findById(@PathVariable("id") String id) {
-//		Response<Ticket> response = new Response<Ticket>();
-//		Ticket ticket = ticketService.findById(id);
-//		if (ticket == null) {
-//			response.getErrors().add("Registro não encontrado pelo id: " + id);
-//			return ResponseEntity.badRequest().body(response);
-//		}
-//
-//		List<ChangeStatus> changes = new ArrayList<ChangeStatus>();
-//		Iterable<ChangeStatus> changesCurrent = ticketService.listChangeStatus(ticket.getId());
-//		for (Iterator<ChangeStatus> iterator = changesCurrent.iterator(); iterator.hasNext();) {
-//			ChangeStatus changeStatus = (ChangeStatus) iterator.next();
-//			changeStatus.setTicket(null);
-//			changes.add(changeStatus);
-//
-//		}
-//		ticket.setChanges(changes);
-//		response.setData(ticket);
-//		return ResponseEntity.ok(response);
-//
-//	}
-	
 	
 	@GetMapping(value = "/{id}")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
@@ -194,23 +81,29 @@ public class TicketResource {
 		
 		return ResponseEntity.ok().body(ticket);		
 	}
+//	
+//	@DeleteMapping(value = "/{id}")
+//	@PreAuthorize("hasAnyRole('CUSTOMER')")
+//	public ResponseEntity<Response<String>> delete(@PathVariable("id") String id) {
+//		Response<String> response = new Response<String>();
+//		Ticket ticket = ticketService.findById(id);
+//		if (ticket == null) {
+//			response.getErrors().add("Registro não encontrado pelo id: " + id);
+//			return ResponseEntity.badRequest().body(response);
+//		}
+//
+//		ticketService.delete(id);
+//		return ResponseEntity.ok(new Response<String>());
+//	}
 	
-	
-	
-
 	@DeleteMapping(value = "/{id}")
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
-	public ResponseEntity<Response<String>> delete(@PathVariable("id") String id) {
-		Response<String> response = new Response<String>();
-		Ticket ticket = ticketService.findById(id);
-		if (ticket == null) {
-			response.getErrors().add("Registro não encontrado pelo id: " + id);
-			return ResponseEntity.badRequest().body(response);
-		}
-
+	public ResponseEntity<Void> delete(@PathVariable("id") String id) {
 		ticketService.delete(id);
-		return ResponseEntity.ok(new Response<String>());
+		
+		return ResponseEntity.noContent().build();
 	}
+	
 
 	@GetMapping(value = "/{page}/{count}")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
