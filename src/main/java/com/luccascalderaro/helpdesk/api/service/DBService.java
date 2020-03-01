@@ -23,15 +23,25 @@ public class DBService {
 
 	public void instantiateDatabase() throws ParseException {
 
-		User us1 = new User(null, "luccashmc@hotmail.com", pe.encode("123"));
-		
-		Set<ProfileEnum> penum = new HashSet<>();
-		penum.add(ProfileEnum.ROLE_ADMIN);
-		
-		us1.setProfile(penum);
-		
-		userRepository.save(us1);
-		
+
+		User us2 = new User(null, "luccashmc2@hotmail.com", pe.encode("123"));
+
+		Set<ProfileEnum> penum2 = new HashSet<>();
+		penum2.add(ProfileEnum.ROLE_ADMIN);
+
+		us2.setProfile(penum2);
+
+		userRepository.save(us2);
+
+		User us3 = new User(null, "luccashmc3@hotmail.com", pe.encode("123"));
+
+		Set<ProfileEnum> penum3 = new HashSet<>();
+		penum3.add(ProfileEnum.ROLE_CUSTOMER);
+
+		us3.setProfile(penum3);
+
+		userRepository.save(us3);
+
 	}
 
 }

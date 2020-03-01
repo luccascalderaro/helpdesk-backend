@@ -1,5 +1,6 @@
 package com.luccascalderaro.helpdesk.api.entity;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.validation.constraints.Email;
@@ -13,8 +14,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.luccascalderaro.helpdesk.api.enums.ProfileEnum;
 
 @Document
-public class User {
-	
+public class User implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	private String id;
 	

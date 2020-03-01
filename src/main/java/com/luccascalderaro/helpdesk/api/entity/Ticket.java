@@ -1,5 +1,6 @@
 package com.luccascalderaro.helpdesk.api.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -12,8 +13,9 @@ import com.luccascalderaro.helpdesk.api.enums.PriorityEnum;
 import com.luccascalderaro.helpdesk.api.enums.StatusEnum;
 
 @Document
-public class Ticket {
-	
+public class Ticket implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	private String id;
 	
@@ -39,6 +41,25 @@ public class Ticket {
 	
 	@Transient
 	private List<ChangeStatus> changes;
+	
+	public Ticket() {
+		
+	}
+	
+	public Ticket(String id, User user, Date date, String title, Integer number, StatusEnum status,
+			PriorityEnum priority, User assignedUser, String description, String image) {
+		super();
+		this.id = id;
+		this.user = user;
+		this.date = date;
+		this.title = title;
+		this.number = number;
+		this.status = status;
+		this.priority = priority;
+		this.assignedUser = assignedUser;
+		this.description = description;
+		this.image = image;
+	}
 
 	public String getId() {
 		return id;

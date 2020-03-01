@@ -1,5 +1,6 @@
 package com.luccascalderaro.helpdesk.api.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
@@ -9,8 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.luccascalderaro.helpdesk.api.enums.StatusEnum;
 
 @Document
-public class ChangeStatus {
-	
+public class ChangeStatus implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	private String id;
 	
@@ -23,6 +25,20 @@ public class ChangeStatus {
 	private Date dateChangeStatus;
 	
 	private StatusEnum status;
+	
+	public ChangeStatus() {
+		
+	}
+	
+	
+	public ChangeStatus(String id, Ticket ticket, User userChange, Date dateChangeStatus, StatusEnum status) {
+		super();
+		this.id = id;
+		this.ticket = ticket;
+		this.userChange = userChange;
+		this.dateChangeStatus = dateChangeStatus;
+		this.status = status;
+	}
 
 	public String getId() {
 		return id;

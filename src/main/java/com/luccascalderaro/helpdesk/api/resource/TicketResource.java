@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
@@ -202,17 +201,23 @@ public class TicketResource {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping(value = "/{page}/{count}/{number}/{title}/{status}/{priority}/{assigned}")
+	@GetMapping(value = "/{page}/{count}/{number}/{title}/{status}/{priority}/{assisgned}")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
 	public ResponseEntity<Response<Page<Ticket>>> findByParams(HttpServletRequest request,
-			@PathVariable("page") int page, @PathVariable("count") int count, @PathVariable("count") Integer number,
-			@PathVariable("count") String title, @PathVariable("count") String status,
-			@PathVariable("count") String priority, @PathVariable("count") boolean assigned) {
+			@PathVariable("page") int page,
+			@PathVariable("count") int count,
+			@PathVariable("number") Integer number,
+			@PathVariable("title") String title,
+			@PathVariable("status") String status,
+			@PathVariable("priority") String priority
+			,@PathVariable("assigned") boolean assigned
+			) {
 
 		title = title.equals("uninformed") ? "" : title;
 		status = status.equals("uninformed") ? "" : status;
 		priority = priority.equals("uninformed") ? "" : priority;
 
+		
 		Response<Page<Ticket>> response = new Response<Page<Ticket>>();
 		Page<Ticket> tickets = null;
 		if (number > 0) {
