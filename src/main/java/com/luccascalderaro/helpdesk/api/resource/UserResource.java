@@ -63,20 +63,6 @@ public class UserResource {
 
 	}
 
-//	@DeleteMapping(value = "/{id}")
-//	@PreAuthorize("hasAnyRole('ADMIN')")
-//	public ResponseEntity<Response<String>> delete(@PathVariable("id") String id) {
-//		Response<String> response = new Response<String>();
-//		User user = userService.findById(id);
-//		if (user == null) {
-//			response.getErrors().add("Registro não encontrado pelo id: " + id);
-//			return ResponseEntity.badRequest().body(response);
-//		}
-//		userService.delete(id);
-//		return ResponseEntity.ok(new Response<String>());
-//
-//	}
-	
 	@DeleteMapping(value = "/{id}")
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	public ResponseEntity<Void> delete(@PathVariable("id") String id) {
@@ -87,14 +73,14 @@ public class UserResource {
 	
 	}
 	
-
 	@GetMapping(value = "/{page}/{count}")
 	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<Response<Page<User>>> finAll(@PathVariable int page, @PathVariable int count) {
-		Response<Page<User>> response = new Response<Page<User>>();
-		Page<User> users = userService.findAll(page, count);
-		response.setData(users);
-		return ResponseEntity.ok(response);
-	}
+	public ResponseEntity<Page<User>> finAll(@PathVariable int page, @PathVariable int count) {
+		
+		Page<User> pg = userService.findAll(page, count);
+		
+		return ResponseEntity.ok().body(pg);
+	
+}
 
 }
