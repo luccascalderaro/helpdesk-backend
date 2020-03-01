@@ -8,7 +8,7 @@ public interface UserServiceInterface {
 	
 	User findByEmail(String email);
 	
-	User createOrUpdate(User user);
+	User insert(User user);
 	
 	User findById(String id);
 	

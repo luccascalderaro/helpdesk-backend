@@ -40,6 +40,18 @@ public class ResourceExceptionHandler {
 
 	}
 	
+	@ExceptionHandler(com.luccascalderaro.helpdesk.api.exception.MongoWriteException.class)
+	public ResponseEntity<StandardError> mongoWriteException(com.luccascalderaro.helpdesk.api.exception.MongoWriteException e,HttpServletRequest request) {
+
+		StandardError err = new StandardError(System.currentTimeMillis(),HttpStatus.BAD_REQUEST.value(),"Email já cadastrado", e.getMessage(), request.getRequestURI());
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+
+	}
+	
+	
+	
+	
 	
 	
 

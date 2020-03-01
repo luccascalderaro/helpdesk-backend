@@ -1,5 +1,7 @@
 package com.luccascalderaro.helpdesk.api.resource;
 
+import java.net.URI;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.luccascalderaro.helpdesk.api.entity.User;
 import com.luccascalderaro.helpdesk.api.response.Response;
@@ -33,70 +36,96 @@ public class UserResource {
 	@Autowired
 	private UserServiceImpl userService;
 	
-	@Autowired
-	private PasswordEncoder pe;
+//	@Autowired
+//	private PasswordEncoder pe;
+	
+//	@PostMapping
+//	@PreAuthorize("hasAnyRole('ADMIN')")
+//	public ResponseEntity<Response<User>> create(HttpServletRequest request, @RequestBody User user, BindingResult result){
+//		
+//		Response<User> response = new Response<User>();
+//		try {
+//			
+//			validateCreateUser(user, result);
+//			if(result.hasErrors()) {
+//				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
+//				return ResponseEntity.badRequest().body(response);
+//			}
+//			user.setPassword(pe.encode(user.getPassword()));
+//			User userPersisted = (User) userService.createOrUpdate(user);
+//			response.setData(userPersisted);
+//		}
+//		
+//		
+//		
+//		catch(DuplicateKeyException dE) {
+//			response.getErrors().add("Email ja cadastrado");
+//			return ResponseEntity.badRequest().body(response);
+//		}
+//		catch(Exception e) {
+//			response.getErrors().add(e.getMessage());
+//			return ResponseEntity.badRequest().body(response);
+//		}
+//		
+//		return ResponseEntity.ok(response);
+//		
+//	}
+	
 	
 	@PostMapping
 	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<Response<User>> create(HttpServletRequest request, @RequestBody User user, BindingResult result){
+	public ResponseEntity<User> create(HttpServletRequest request, @RequestBody User user, BindingResult result){
+		userService.insert(user);
 		
-		Response<User> response = new Response<User>();
-		try {
-			
-			validateCreateUser(user, result);
-			if(result.hasErrors()) {
-				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
-				return ResponseEntity.badRequest().body(response);
-			}
-			user.setPassword(pe.encode(user.getPassword()));
-			User userPersisted = (User) userService.createOrUpdate(user);
-			response.setData(userPersisted);
-		}
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();
 		
-		
-		
-		catch(DuplicateKeyException dE) {
-			response.getErrors().add("Email ja cadastrado");
-			return ResponseEntity.badRequest().body(response);
-		}
-		catch(Exception e) {
-			response.getErrors().add(e.getMessage());
-			return ResponseEntity.badRequest().body(response);
-		}
-		
-		return ResponseEntity.ok(response);
-		
+		return ResponseEntity.created(uri).build() ;
 	}
 	
-	private void validateCreateUser(User user, BindingResult result) {
-		if(user.getEmail()==null) {
-			result.addError(new ObjectError("User", "Email nao informado"));
-		}
-	}
+	
+	
+//	private void validateCreateUser(User user, BindingResult result) {
+//		if(user.getEmail()==null) {
+//			result.addError(new ObjectError("User", "Email nao informado"));
+//		}
+//	}
+	
+//	@PutMapping
+//	@PreAuthorize("hasAnyRole('ADMIN')")
+//	public ResponseEntity<Response<User>> update(HttpServletRequest request, @RequestBody User user, BindingResult result){
+//		 Response<User> response = new Response<User>();
+//		 
+//		 try {
+//			 validateUpdateUser(user, result);
+//			 if(result.hasErrors()) {
+//				 result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
+//				 return ResponseEntity.badRequest().body(response);
+//			 }
+//			 user.setPassword(pe.encode(user.getPassword()));
+//			 User userPersisted = (User) userService.createOrUpdate(user);
+//			 response.setData(userPersisted);
+//		 }
+//		 
+//		 catch(Exception e) {
+//			 response.getErrors().add(e.getMessage());
+//			 return ResponseEntity.badRequest().body(response);
+//		 }
+//		 
+//		 return ResponseEntity.ok(response);
+//	}
 	
 	@PutMapping
 	@PreAuthorize("hasAnyRole('ADMIN')")
-	public ResponseEntity<Response<User>> update(HttpServletRequest request, @RequestBody User user, BindingResult result){
-		 Response<User> response = new Response<User>();
-		 
-		 try {
-			 validateUpdateUser(user, result);
-			 if(result.hasErrors()) {
-				 result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
-				 return ResponseEntity.badRequest().body(response);
-			 }
-			 user.setPassword(pe.encode(user.getPassword()));
-			 User userPersisted = (User) userService.createOrUpdate(user);
-			 response.setData(userPersisted);
-		 }
-		 
-		 catch(Exception e) {
-			 response.getErrors().add(e.getMessage());
-			 return ResponseEntity.badRequest().body(response);
-		 }
-		 
-		 return ResponseEntity.ok(response);
+	public ResponseEntity<User> update(HttpServletRequest request, @RequestBody User user, BindingResult result){
+		
+		userService.update(user);
+		
+		return ResponseEntity.noContent().build();
 	}
+	
+	
+	
+	
 	
 	private void validateUpdateUser(User user, BindingResult result) {
 		if(user.getId() == null) {
