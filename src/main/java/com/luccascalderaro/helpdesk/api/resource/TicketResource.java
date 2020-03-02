@@ -53,93 +53,82 @@ public class TicketResource {
 	@PostMapping()
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
 	public ResponseEntity<Ticket> insert(HttpServletRequest request, @RequestBody Ticket ticket, BindingResult result) {
-		
+
 		ticket.setId(null);
 		ticketService.insert(ticket);
-		
+
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(ticket.getId()).toUri();
-		
+
 		return ResponseEntity.created(uri).build();
 	}
-	
+
 	@PutMapping()
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
-	public ResponseEntity<Ticket> update(HttpServletRequest request, @RequestBody Ticket ticket,
-			BindingResult result) {
-		
+	public ResponseEntity<Ticket> update(HttpServletRequest request, @RequestBody Ticket ticket, BindingResult result) {
+
 		ticketService.update(ticket);
-		
+
 		return ResponseEntity.noContent().build();
 	}
-	
-	
+
 	@GetMapping(value = "/{id}")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
 	public ResponseEntity<Ticket> findById(@PathVariable("id") String id) {
-		
+
 		Ticket ticket = ticketService.findById(id);
-		
-		return ResponseEntity.ok().body(ticket);		
+
+		return ResponseEntity.ok().body(ticket);
 	}
-//	
-//	@DeleteMapping(value = "/{id}")
-//	@PreAuthorize("hasAnyRole('CUSTOMER')")
-//	public ResponseEntity<Response<String>> delete(@PathVariable("id") String id) {
-//		Response<String> response = new Response<String>();
-//		Ticket ticket = ticketService.findById(id);
-//		if (ticket == null) {
-//			response.getErrors().add("Registro não encontrado pelo id: " + id);
-//			return ResponseEntity.badRequest().body(response);
-//		}
-//
-//		ticketService.delete(id);
-//		return ResponseEntity.ok(new Response<String>());
-//	}
-	
+
 	@DeleteMapping(value = "/{id}")
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
 	public ResponseEntity<Void> delete(@PathVariable("id") String id) {
 		ticketService.delete(id);
-		
+
 		return ResponseEntity.noContent().build();
 	}
-	
+
+//	@GetMapping(value = "/{page}/{count}")
+//	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
+//	public ResponseEntity<Response<Page<Ticket>>> findAll(HttpServletRequest request, @PathVariable("page") int page,
+//			@PathVariable("count") int count) {
+//		Response<Page<Ticket>> response = new Response<Page<Ticket>>();
+//		Page<Ticket> tickets = null;
+//		User userRequest = ticketService.userFromRequest(request);
+//
+//		if (userRequest.getProfile().contains(ProfileEnum.ROLE_TECHNICIAN)) {
+//			tickets = ticketService.listTicket(page, count);
+//		} else if (userRequest.getProfile().contains(ProfileEnum.ROLE_CUSTOMER)) {
+//			tickets = ticketService.findByCurrentUser(page, count, userRequest.getId());
+//		}
+//
+//		response.setData(tickets);
+//		return ResponseEntity.ok(response);
+//	}
 
 	@GetMapping(value = "/{page}/{count}")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
-	public ResponseEntity<Response<Page<Ticket>>> findAll(HttpServletRequest request, @PathVariable("page") int page,
+	public ResponseEntity<Page<Ticket>> findAll(HttpServletRequest request, @PathVariable("page") int page,
 			@PathVariable("count") int count) {
-		Response<Page<Ticket>> response = new Response<Page<Ticket>>();
-		Page<Ticket> tickets = null;
-		User userRequest = ticketService.userFromRequest(request);
+		
+		
+		Page<Ticket> pages = this.ticketService.findAllParams(page, count);
+		
+		return ResponseEntity.ok().body(pages);
 
-		if (userRequest.getProfile().contains(ProfileEnum.ROLE_TECHNICIAN)) {
-			tickets = ticketService.listTicket(page, count);
-		} else if (userRequest.getProfile().contains(ProfileEnum.ROLE_CUSTOMER)) {
-			tickets = ticketService.findByCurrentUser(page, count, userRequest.getId());
-		}
-
-		response.setData(tickets);
-		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping(value = "/{page}/{count}/{number}/{title}/{status}/{priority}/{assisgned}")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
 	public ResponseEntity<Response<Page<Ticket>>> findByParams(HttpServletRequest request,
-			@PathVariable("page") int page,
-			@PathVariable("count") int count,
-			@PathVariable("number") Integer number,
-			@PathVariable("title") String title,
-			@PathVariable("status") String status,
-			@PathVariable("priority") String priority
-			,@PathVariable("assigned") boolean assigned
-			) {
+			@PathVariable("page") int page, @PathVariable("count") int count, @PathVariable("number") Integer number,
+			@PathVariable("title") String title, @PathVariable("status") String status,
+			@PathVariable("priority") String priority, @PathVariable("assigned") boolean assigned) {
 
 		title = title.equals("uninformed") ? "" : title;
 		status = status.equals("uninformed") ? "" : status;
 		priority = priority.equals("uninformed") ? "" : priority;
 
-		
 		Response<Page<Ticket>> response = new Response<Page<Ticket>>();
 		Page<Ticket> tickets = null;
 		if (number > 0) {
@@ -197,8 +186,8 @@ public class TicketResource {
 //		}
 //		return ResponseEntity.ok(response);
 //	}
-	
-	private void validateChangeStatus(String id,String status, BindingResult result) {
+
+	private void validateChangeStatus(String id, String status, BindingResult result) {
 		if (id == null || id.equals("")) {
 			result.addError(new ObjectError("Ticket", "Id no information"));
 			return;
@@ -208,7 +197,7 @@ public class TicketResource {
 			return;
 		}
 	}
-	
+
 	@GetMapping(value = "/summary")
 	public ResponseEntity<Response<Summary>> findChart() {
 		Response<Summary> response = new Response<Summary>();
@@ -223,25 +212,25 @@ public class TicketResource {
 		if (tickets != null) {
 			for (Iterator<Ticket> iterator = tickets.iterator(); iterator.hasNext();) {
 				Ticket ticket = iterator.next();
-				if(ticket.getStatus().equals(StatusEnum.New)){
-					amountNew ++;
+				if (ticket.getStatus().equals(StatusEnum.New)) {
+					amountNew++;
 				}
-				if(ticket.getStatus().equals(StatusEnum.Resolved)){
-					amountResolved ++;
+				if (ticket.getStatus().equals(StatusEnum.Resolved)) {
+					amountResolved++;
 				}
-				if(ticket.getStatus().equals(StatusEnum.Approved)){
-					amountApproved ++;
+				if (ticket.getStatus().equals(StatusEnum.Approved)) {
+					amountApproved++;
 				}
-				if(ticket.getStatus().equals(StatusEnum.Disapproved)){
-					amountDisapproved ++;
+				if (ticket.getStatus().equals(StatusEnum.Disapproved)) {
+					amountDisapproved++;
 				}
-				if(ticket.getStatus().equals(StatusEnum.Assigned)){
-					amountAssigned ++;
+				if (ticket.getStatus().equals(StatusEnum.Assigned)) {
+					amountAssigned++;
 				}
-				if(ticket.getStatus().equals(StatusEnum.Closed)){
-					amountClosed ++;
+				if (ticket.getStatus().equals(StatusEnum.Closed)) {
+					amountClosed++;
 				}
-			}	
+			}
 		}
 		chart.setAmountNew(amountNew);
 		chart.setAmountResolved(amountResolved);
@@ -252,16 +241,5 @@ public class TicketResource {
 		response.setData(chart);
 		return ResponseEntity.ok(response);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-		
-	
 
 }

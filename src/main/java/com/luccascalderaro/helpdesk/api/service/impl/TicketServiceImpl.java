@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.luccascalderaro.helpdesk.api.entity.ChangeStatus;
 import com.luccascalderaro.helpdesk.api.entity.Ticket;
 import com.luccascalderaro.helpdesk.api.entity.User;
+import com.luccascalderaro.helpdesk.api.enums.ProfileEnum;
 import com.luccascalderaro.helpdesk.api.enums.StatusEnum;
 import com.luccascalderaro.helpdesk.api.exception.ObjectNotFoundException;
 import com.luccascalderaro.helpdesk.api.repository.ChangeStatusRepository;
@@ -25,96 +26,100 @@ import com.luccascalderaro.helpdesk.api.service.UserService;
 import com.luccascalderaro.helpdesk.api.service.UserServiceInterface;
 
 @Service
-public class TicketServiceImpl implements TicketService  {
-	
+public class TicketServiceImpl implements TicketService {
+
 	@Autowired
 	private TicketRepository ticketRepository;
-	
+
 	@Autowired
 	private ChangeStatusRepository changeStatusRepository;
-	
+
 	@Autowired
 	private UserServiceInterface userService;
 
+	@Autowired
+	private UserService userlogado;
+
 	@Override
 	public Ticket insert(Ticket ticket) {
-		
+
 		ticket.setStatus(StatusEnum.New);
 		Date date = new Date(System.currentTimeMillis());
 		ticket.setDate(date);
 		ticket.setNumber(generateNumber());
 		
+		UserSS uSS = UserService.authenticated();
 		
+		User us1 = userService.findByEmail(uSS.getUsername());
+		
+		ticket.setUser(us1);
+
 		return this.ticketRepository.save(ticket);
 	}
-	
+
 	private Integer generateNumber() {
 		Random random = new Random();
 		return random.nextInt(9999);
 	}
-	
-	
+
 	public void updateAux(Ticket newObj, Ticket obj) {
-		
-		if(obj.getAssignedUser() != null) {
+
+		if (obj.getAssignedUser() != null) {
 			newObj.setAssignedUser(obj.getAssignedUser());
 		}
-		
-		if(obj.getChanges() != null) {
+
+		if (obj.getChanges() != null) {
 			newObj.setChanges(obj.getChanges());
 		}
-		
-		if(obj.getDate() != null) {
+
+		if (obj.getDate() != null) {
 			newObj.setDate(obj.getDate());
 		}
-		
-		if(obj.getDescription() != null) {
+
+		if (obj.getDescription() != null) {
 			newObj.setDescription(obj.getDescription());
 		}
-		
-		if(obj.getNumber() != null) {
+
+		if (obj.getNumber() != null) {
 			newObj.setNumber(obj.getNumber());
 		}
-		
-		if(obj.getUser() != null) {
+
+		if (obj.getUser() != null) {
 			newObj.setUser(obj.getUser());
 		}
-		
-		if(obj.getId() != null) {
+
+		if (obj.getId() != null) {
 			newObj.setId(obj.getId());
 		}
-		
-		if(obj.getImage() != null) {
+
+		if (obj.getImage() != null) {
 			newObj.setImage(obj.getImage());
 		}
-		
-		if(obj.getPriority() != null) {
+
+		if (obj.getPriority() != null) {
 			newObj.setPriority(obj.getPriority());
 		}
-		
-		if(obj.getStatus() != null) {
+
+		if (obj.getStatus() != null) {
 			newObj.setStatus(obj.getStatus());
 		}
-		
-		if(obj.getTitle() != null) {
+
+		if (obj.getTitle() != null) {
 			newObj.setTitle(obj.getTitle());
 		}
-		
-		
+
 	}
-	
+
 	public Ticket update(Ticket ticket) {
-		
+
 		Ticket ticketNew = findById(ticket.getId());
-		
+
 		updateAux(ticketNew, ticket);
-		
+
 		return ticketRepository.save(ticketNew);
-		
+
 	}
-	
-	
-	
+
 	public User userFromRequest(HttpServletRequest request) {
 
 		UserSS uss = UserService.authenticated();
@@ -125,55 +130,59 @@ public class TicketServiceImpl implements TicketService  {
 
 	@Override
 	public Ticket findById(String id) {
-		
+
 		Optional<Ticket> ticket = this.ticketRepository.findById(id);
-		
+
 		return ticket.orElseThrow(() -> new ObjectNotFoundException("Nao encontrado"));
 	}
 
 	@Override
 	public void delete(String id) {
 		this.ticketRepository.deleteById(id);
-		
+
 	}
 
 	@Override
 	public Page<Ticket> listTicket(int page, int count) {
 		Pageable pages = PageRequest.of(page, count);
-		
+
 		return this.ticketRepository.findAll(pages);
 	}
 
 	@Override
 	public ChangeStatus createChangeStatus(ChangeStatus changeStatus) {
 		return this.changeStatusRepository.save(changeStatus);
-		
+
 	}
 
 	@Override
 	public Iterable<ChangeStatus> listChangeStatus(String ticketId) {
-		
+
 		return this.changeStatusRepository.findByTicketIdOrderByDateChangeStatusDesc(ticketId);
 	}
 
 	@Override
 	public Page<Ticket> findByCurrentUser(int page, int count, String userId) {
 		Pageable pages = PageRequest.of(page, count);
-		
+
 		return this.ticketRepository.findByUserIdOrderByDateDesc(pages, userId);
 	}
 
 	@Override
 	public Page<Ticket> findByParameters(int page, int count, String title, String status, String priority) {
 		Pageable pages = PageRequest.of(page, count);
-		return this.ticketRepository.findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingOrderByDateDesc(title, status, priority, pages);
+		return this.ticketRepository
+				.findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingOrderByDateDesc(
+						title, status, priority, pages);
 	}
 
 	@Override
 	public Page<Ticket> findByParametersAndCurrent(int page, int count, String title, String status, String priority,
 			String userId) {
 		Pageable pages = PageRequest.of(page, count);
-		return this.ticketRepository.findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingAndUserIdOrderByDateDesc(title, status, priority, userId, pages);
+		return this.ticketRepository
+				.findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingAndUserIdOrderByDateDesc(
+						title, status, priority, userId, pages);
 	}
 
 	@Override
@@ -183,17 +192,45 @@ public class TicketServiceImpl implements TicketService  {
 	}
 
 	@Override
+	public Page<Ticket> findAll(int page, int count) {
+
+		Pageable pages = PageRequest.of(page, count);
+		return this.ticketRepository.findAll(pages);
+
+	}
+
 	public Iterable<Ticket> findAll() {
-	
+
 		return this.ticketRepository.findAll();
+
+	}
+
+	public Page<Ticket> findAllParams(int page, int count) {
+		UserSS uSS1 = UserService.authenticated();
+
+		User u1 = userService.findByEmail(uSS1.getUsername());
+
+		if (u1.getProfile().contains(ProfileEnum.ROLE_TECHNICIAN)) {
+
+			return this.findAll(page, count);
+		} else if (u1.getProfile().contains(ProfileEnum.ROLE_CUSTOMER)) {
+			return findByCurrentUser(page, count, u1.getId());
+
+		}
+
+		else
+			return null;
+
 	}
 
 	@Override
 	public Page<Ticket> findByParameterAndAssignedUser(int page, int count, String title, String status,
 			String priority, String assignedUser) {
 		Pageable pages = PageRequest.of(page, count);
-		
-		return this.ticketRepository.findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingAndAssignedUserIdOrderByDateDesc(title, status, priority, assignedUser, pages);
+
+		return this.ticketRepository
+				.findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingAndAssignedUserIdOrderByDateDesc(
+						title, status, priority, assignedUser, pages);
 	}
 
 }

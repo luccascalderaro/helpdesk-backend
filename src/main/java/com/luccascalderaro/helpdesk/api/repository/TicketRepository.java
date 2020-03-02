@@ -23,4 +23,8 @@ Page<Ticket> findByUserIdOrderByDateDesc(Pageable pages,String userId);
 	
 	Page<Ticket> findByTitleIgnoreCaseContainingAndStatusIgnoreCaseContainingAndPriorityIgnoreCaseContainingAndAssignedUserIdOrderByDateDesc(
 			String title,String status,String priority,String assignedUserId,Pageable pages);
+	
+	
+	
+	
 }
