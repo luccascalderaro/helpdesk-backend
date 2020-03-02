@@ -88,29 +88,10 @@ public class TicketResource {
 		return ResponseEntity.noContent().build();
 	}
 
-//	@GetMapping(value = "/{page}/{count}")
-//	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
-//	public ResponseEntity<Response<Page<Ticket>>> findAll(HttpServletRequest request, @PathVariable("page") int page,
-//			@PathVariable("count") int count) {
-//		Response<Page<Ticket>> response = new Response<Page<Ticket>>();
-//		Page<Ticket> tickets = null;
-//		User userRequest = ticketService.userFromRequest(request);
-//
-//		if (userRequest.getProfile().contains(ProfileEnum.ROLE_TECHNICIAN)) {
-//			tickets = ticketService.listTicket(page, count);
-//		} else if (userRequest.getProfile().contains(ProfileEnum.ROLE_CUSTOMER)) {
-//			tickets = ticketService.findByCurrentUser(page, count, userRequest.getId());
-//		}
-//
-//		response.setData(tickets);
-//		return ResponseEntity.ok(response);
-//	}
-
 	@GetMapping(value = "/{page}/{count}")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
 	public ResponseEntity<Page<Ticket>> findAll(HttpServletRequest request, @PathVariable("page") int page,
 			@PathVariable("count") int count) {
-		
 		
 		Page<Ticket> pages = this.ticketService.findAllParams(page, count);
 		
@@ -118,9 +99,10 @@ public class TicketResource {
 
 	}
 
+
 	@GetMapping(value = "/{page}/{count}/{number}/{title}/{status}/{priority}/{assisgned}")
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'TECHNICIAN')")
-	public ResponseEntity<Response<Page<Ticket>>> findByParams(HttpServletRequest request,
+	public ResponseEntity<Page<Ticket>> findByParams(HttpServletRequest request,
 			@PathVariable("page") int page, @PathVariable("count") int count, @PathVariable("number") Integer number,
 			@PathVariable("title") String title, @PathVariable("status") String status,
 			@PathVariable("priority") String priority, @PathVariable("assigned") boolean assigned) {
@@ -129,10 +111,10 @@ public class TicketResource {
 		status = status.equals("uninformed") ? "" : status;
 		priority = priority.equals("uninformed") ? "" : priority;
 
-		Response<Page<Ticket>> response = new Response<Page<Ticket>>();
 		Page<Ticket> tickets = null;
 		if (number > 0) {
 			tickets = ticketService.findByNumber(page, count, number);
+			
 		} else {
 			User userRequest = ticketService.userFromRequest(request);
 			if (userRequest.getProfile().contains(ProfileEnum.ROLE_TECHNICIAN)) {
@@ -147,8 +129,7 @@ public class TicketResource {
 						userRequest.getId());
 			}
 		}
-		response.setData(tickets);
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok().body(tickets);
 	}
 
 //	@PutMapping(value = "/{id}/{status}")
