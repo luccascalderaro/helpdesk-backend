@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -132,51 +133,15 @@ public class TicketResource {
 		return ResponseEntity.ok().body(tickets);
 	}
 
-//	@PutMapping(value = "/{id}/{status}")
-//	@PreAuthorize("hasAnyRole('CUSTOMER','TECHNICIAN')")
-//	public ResponseEntity<Response<Ticket>> changeStatus(
-//													@PathVariable("id") String id, 
-//													@PathVariable("status") String status, 
-//													HttpServletRequest request,  
-//													@RequestBody Ticket ticket,
-//													BindingResult result) {
-//		
-//		Response<Ticket> response = new Response<Ticket>();
-//		try {
-//			validateChangeStatus(id, status, result);
-//			if (result.hasErrors()) {
-//				result.getAllErrors().forEach(error -> response.getErrors().add(error.getDefaultMessage()));
-//				return ResponseEntity.badRequest().body(response);
-//			}
-//			Ticket ticketCurrent = ticketService.findById(id);
-//			ticketCurrent.setStatus(StatusEnum.getStatus(status));
-//			if(status.equals("Assigned")) {
-//				ticketCurrent.setAssignedUser(userFromRequest(request));
-//			}
-//			Ticket ticketPersisted = (Ticket) ticketService.createOrUpdate(ticketCurrent);
-//			ChangeStatus changeStatus = new ChangeStatus();
-//			changeStatus.setUserChange(userFromRequest(request));
-//			changeStatus.setDateChangeStatus(new Date());
-//			changeStatus.setStatus(StatusEnum.getStatus(status));
-//			changeStatus.setTicket(ticketPersisted);
-//			ticketService.createChangeStatus(changeStatus);
-//			response.setData(ticketPersisted);
-//		} catch (Exception e) {
-//			response.getErrors().add(e.getMessage());
-//			return ResponseEntity.badRequest().body(response);
-//		}
-//		return ResponseEntity.ok(response);
-//	}
-
-	private void validateChangeStatus(String id, String status, BindingResult result) {
-		if (id == null || id.equals("")) {
-			result.addError(new ObjectError("Ticket", "Id no information"));
-			return;
-		}
-		if (status == null || status.equals("")) {
-			result.addError(new ObjectError("Ticket", "Status no information"));
-			return;
-		}
+	@PutMapping(value = "/{id}/status")
+	@PreAuthorize("hasAnyRole('CUSTOMER','TECHNICIAN')")
+	public ResponseEntity<Ticket> changeStatus(
+													@PathVariable("id") String id,
+													@Valid @RequestBody Ticket ticket,
+													HttpServletRequest request,
+													BindingResult result) {
+		ticketService.updateStatusTicket(id, ticket.getStatus());	
+		return ResponseEntity.noContent().build();			
 	}
 
 	@GetMapping(value = "/summary")

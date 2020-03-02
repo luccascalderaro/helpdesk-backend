@@ -119,6 +119,13 @@ public class TicketServiceImpl implements TicketService {
 		return ticketRepository.save(ticketNew);
 
 	}
+	
+	public Ticket updateStatusTicket(String id, StatusEnum status) {
+		Ticket ticket = findById(id);
+		ticket.setStatus(status);
+		this.ticketRepository.save(ticket);
+		return ticket;
+	}
 
 	public User userFromRequest(HttpServletRequest request) {
 
